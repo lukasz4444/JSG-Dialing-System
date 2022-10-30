@@ -4,7 +4,7 @@
 
 1. make sure that you are in $home directory.
 
-2. write pastebin run
+2. write pastebin run eFVd5fUS
 
 3. choose with numbers your language.
 
