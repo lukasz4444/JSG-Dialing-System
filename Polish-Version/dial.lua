@@ -3,7 +3,10 @@ c = require("component")
 event = require("event")
 term = require("term")
 pc = require("computer")
-local settings = require("settings")
+sh = require("shell")
+local dir = "/JDS"
+sh.setWorkingDirectory(dir)
+local settings = dofile("settings.cfg")
 local DHDPresent = false
 if not c.isAvailable("stargate") then
   io.stderr:write("Nie Podłączono Gwiezdnych Wrót.")
@@ -12,6 +15,35 @@ elseif c.isAvailable("stargate") then
   sg = c.stargate
 end
 
+local function openchoice()
+  stargate_incoming_wormhole = event.listen("stargate_incoming_wormhole", function(_, _, caller, dialedAddressSize)
+      print("Zewnętrzna aktywacja!")
+      os.sleep(4)     
+  end)
+    term.clear()
+    print("Co JDS powinien zrobić?")
+    print("1. Wyłączyć wrota?!")
+    print("2. Wysłać kod przesłony?")
+    choice = io.read()
+    if choice == "1" then 
+      os.execute("off.lua") 
+      pc.shutdown(true) 
+end
+if choice == "2" then 
+  print("Please Write Iris Code")
+  local iriscode = tonumber(io.read())
+  sg.sendIrisCode(iriscode)
+  code_respond = event.listen("code_respond", function(_, _, caller, msg)
+    msg = string.sub(msg, 1, -3)
+    print("")
+    print(msg)
+    os.sleep(10)
+    openchoice()
+  end)
+  openchoice()
+end
+
+end
 if settings.usedhd == true then
   if not c.isAvailable("dhd") then
     io.stderr:write("Nie Podłączono Sterownika Gwiezdnych Wrót. (DHD) ")
@@ -198,6 +230,9 @@ elseif settings.usedhd == false then
 end
   openEvent = event.listen("stargate_open", function()
     print("Wrota Otwarte")
+    if not settings.justone == true then
+      openchoice()
+    end
     if settings.justone == true then
       while true do
         sending = event.listen("stargate_traveler", function(inbound,_,_)
