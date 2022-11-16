@@ -16,7 +16,7 @@ print("LEAVE IT EMPTY TO INSTALL TO /JDS DIRECTORY.")
 print("Example path /home")
 
 local path = io.read()
-
+if path == "" then filepath = "/JDS" else filepath = path end
 t.clear()
 
 print("Choose your language:")
@@ -40,9 +40,8 @@ if path == "" then
             io.stderr:write("Failed to created \"/JDS\" directory, "..msg)
             os.exit(false) end
     end
-    shell.setWorkingDirectory("/JDS")
     local function forceExit(code)
-    if UsersWorkingDir ~= nil then shell.setWorkingDirectory(UsersWorkingDir) end
+        if UsersWorkingDir ~= nil then shell.setWorkingDirectory(UsersWorkingDir) end
         tty.setViewport(table.unpack(OriginalViewport))
         os.exit(code)
     end
@@ -55,9 +54,9 @@ else
     end
 end
 
-shell.setWorkingDirectory("/JDS")
+shell.setWorkingDirectory(filepath)
 local function forceExit(code)
-if UsersWorkingDir ~= nil then shell.setWorkingDirectory(UsersWorkingDir) end
+    if UsersWorkingDir ~= nil then shell.setWorkingDirectory(UsersWorkingDir) end
     tty.setViewport(table.unpack(OriginalViewport))
     os.exit(code)
 end
@@ -75,31 +74,31 @@ local function downloadFile(fileName, verbose)
         file:close()
     end)
     if not isGood then
-        io.stderr:write("Nie można pobrać pliku")
+        io.stderr:write("Unable to download file:")
+        io.stderr:write("")
         io.stderr:write(err)
-        forceExit(false)
     end
 end
-    if HasInternet then internet = require("internet") end
-    if path == "" then filepath = "/JDS" end
-    downloadFile("dial.lua",true)
-    downloadFile("off.lua",true)
-    if not fs.exists("addresses.csv") then
-        downloadFile("addresses.csv",true)
-    else
+if HasInternet then internet = require("internet") end
+
+downloadFile("dial.lua",true)
+downloadFile("off.lua",true)
+if not fs.exists("addresses.csv") then
+    downloadFile("addresses.csv",true)
+else
     print("File addresses.csv already exists")
-    end
-    downloadFile("settings.cfg",true)
-    shell.setWorkingDirectory("/home")
-    if not path == "" then
-        shrc = io.open("/home/.shrc", "w")
-        shrc:write(filepath .. "/dial.lua")
-        shrc:close()
-    else
-        shrc = io.open("/home/.shrc", "w")
-        shrc:write(filepath .. "dial.lua")
-        shrc:close()
-    end
-    os.sleep(1)
-    computer.shutdown(true)
+end
+downloadFile("settings.cfg",true)
+shell.setWorkingDirectory("/home")
+if not path == "" then
+    shrc = io.open("/home/.shrc", "w")
+    shrc:write(filepath .. "/dial.lua")
+    shrc:close()
+else
+    shrc = io.open("/home/.shrc", "w")
+    shrc:write(filepath .. "/dial.lua")
+    shrc:close()
+end
+os.sleep(1)
+computer.shutdown(true)
 
