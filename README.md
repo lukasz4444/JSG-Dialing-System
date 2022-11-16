@@ -10,6 +10,8 @@
 
 4. wait until installation finish
 
+### IF YOU HAVE CHANGED INSTALL DIRECTORY REMEMBER TO CHANGE DIR VARIABLE IN dial.lua
+
 ### Usage
 
 1. After computer reboots you will see 3 example addresses.
