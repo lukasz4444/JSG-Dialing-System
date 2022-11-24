@@ -4,6 +4,7 @@ event = require("event")
 term = require("term")
 pc = require("computer")
 sh = require("shell")
+gpu = c.gpu
 local dir = "/JDS"
 sh.setWorkingDirectory(dir)
 local settings = dofile("settings.cfg")
@@ -175,12 +176,19 @@ term.clear()
   end
   function dialNext(dialed)
     glyph = address[dialed + 1]
+    local test = dialed
+    local test = test + 1
+    gpu.setForeground(0xfcff03)
+    print("Szewron " .. test .. " Wprowadzany -", glyph)
+    print("")
     sg.engageSymbol(glyph)
   end
-print("Przetwarzam ciąg.")
-
+gpu.setForeground(0x03d7ff)
+print("Ciąg w toku.")
+print("")
 key_down = event.listen("key_down", function(_, _, _, code, _)
   if code == 208 then
+    gpu.setForeground(0xffffff)
     os.execute("off.lua")
     os.sleep(0.4)
     if settings.dorestart == true then
@@ -201,11 +209,15 @@ end
 
 eventEngaged = event.listen("stargate_spin_chevron_engaged", function(evname, address, caller, num, lock, glyph)
   if lock then
+    gpu.setForeground(0x03ff35)
     print("Szewron " .. num .. " Zablokowany")
+    print("")
     os.sleep(0.5)
     sg.engageGate()
   else
+    gpu.setForeground(0x03ff35)
     print("Szewron " .. num .. " Wprowadzony -", glyph)
+    print("")
     os.sleep(0.5)
   dialNext(num)
   end
@@ -251,10 +263,12 @@ end
     end
   end)
   failEvent = event.listen("stargate_failed", function(address, caller, reason)
+    gpu.setForeground(0xff0303)
     print("Symbol Ziemi Odmowa Wprowadzenia:")
   end)
   eventEngaged = event.listen("stargate_spin_chevron_engaged", function(_, _, caller, num, lock, glyph) end)
   failEvent = event.listen("stargate_failed", function(_, _, caller, reason)
+    gpu.setForeground(0xff0303)
     if reason == "not_enough_power" then print("Za mało zasilania aby otworzyć Gwiezdne Wrota.") end
     if reason == "address_malformed" then print("Pod podanym adresem nie ma Gwiezdnych Wrót.") end
     if reason == "aborted" then print("Sterownik Wrót typu Universe anulował ciąg.") end
