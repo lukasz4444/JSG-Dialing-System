@@ -208,7 +208,8 @@ end
 
 eventEngaged = event.listen("stargate_spin_chevron_engaged", function(evname, address, caller, num, lock, glyph)
   if lock then
-    gpy.setForeground(0x03ff35)
+    lock = true
+    gpu.setForeground(0x03ff35)
     print("Chevron " .. num .. " Locked -", glyph)
     print("")
     os.sleep(0.5)
@@ -224,10 +225,12 @@ end)
 DHD = event.listen("stargate_dhd_chevron_engaged", function(evname, address, caller, num, lock, glyph)
   if lock then
     lock = true
+    gpu.setForeground(0x03ff35)
     print("Chevron " .. num .. " Locked")
-    os.sleep(0.2)
+    os.sleep(0.5)
     dhd.pressBRB()
   else
+    gpu.setForeground(0x03ff35)
     print("")
     print("Chevron " .. num .. " Locked -", glyph)
     print("")
