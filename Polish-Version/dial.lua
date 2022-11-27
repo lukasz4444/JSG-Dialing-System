@@ -209,6 +209,7 @@ end
 
 eventEngaged = event.listen("stargate_spin_chevron_engaged", function(evname, address, caller, num, lock, glyph)
   if lock then
+    lock = true
     gpu.setForeground(0x03ff35)
     print("Szewron " .. num .. " Zablokowany")
     print("")
