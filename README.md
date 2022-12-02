@@ -12,6 +12,13 @@
 
 ### IF YOU HAVE CHANGED INSTALL DIRECTORY REMEMBER TO CHANGE DIR VARIABLE IN dial.lua
 
+### Updating
+
+1. Copy your addresses.csv somewhere else
+2. Install JSG Again to the same directory it was installed.
+3. Copy addresses.csv to original directory
+
+You have to do this because installer may overwrite existing addresses.csv .
 
 ### Iris Codes
 
