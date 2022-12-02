@@ -14,15 +14,12 @@ function clear()
 end
 function help()
     sg.sendIrisCode(1234)
-    gpu.setForeground(0xFFFFFF) print("Welcome to Stargate Data Transmitter v0.0.1)
+    gpu.setForeground(0xFFFFFF) print("Welcome to Stargate Data Transmitter v0.0.1")
     print("Press t to type message")
     print("Press q to exit")
 end
 clear()
 help()
-local function cancel ()
-cancelEvents(key)
-end
 while true do
     os.sleep(0.1)
     event.listen("code_respond", function(_, _, _, message)
@@ -40,7 +37,6 @@ while true do
             print("write message:")
             message = io.read()
             sg.sendMessageToIncoming(username .. ": " .. message)
-            cancel()
         end
     end)
 end
