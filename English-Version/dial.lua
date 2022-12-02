@@ -5,6 +5,7 @@ term = require("term")
 pc = require("computer")
 sh = require("shell")
 gpu = c.gpu
+local iriscodes = "Iris-Codes.txt"
 local dir = "/JDS"
 sh.setWorkingDirectory(dir)
 local settings = dofile("settings.cfg")
@@ -16,35 +17,6 @@ elseif c.isAvailable("stargate") then
   sg = c.stargate
 end
 
-local function openchoice()
-    stargate_incoming_wormhole = event.listen("stargate_incoming_wormhole", function(_, _, caller, dialedAddressSize)
-        print("OffWorld Activation!")
-        os.sleep(4)     
-    end)
-  term.clear()
-  print("What JDS should do:")
-  print("1. Disengage the gate!")
-  print("2. Send Iris Code")
-  choice = io.read()
-  if choice == "1" then 
-    os.execute("off.lua") 
-    pc.shutdown(true) 
-  end
-  if choice == "2" then 
-    print("Please Write Iris Code")
-    local iriscode = tonumber(io.read())
-    sg.sendIrisCode(iriscode)
-    code_respond = event.listen("code_respond", function(_, _, caller, msg)
-      msg = string.sub(msg, 1, -3)
-      print("")
-      print(msg)
-      os.sleep(10)
-      openchoice()
-    end)
-    openchoice()
-  end
-end
-
 if settings.usedhd == true then
   if not c.isAvailable("dhd") then
     io.stderr:write("DHD not connected.")
@@ -54,7 +26,12 @@ if settings.usedhd == true then
     DHDPresent = true
   end
 end
-
+file = io.open("Iris-Codes.txt", "r")
+ic = {}
+for line in file:lines() do
+  table.insert(ic, line)
+end
+file:close()
 local sgtype = sg.getGateType()
 address = {}
 glyphs = {
@@ -199,14 +176,14 @@ key_down = event.listen("key_down", function(_, _, _, code, _)
 end)
 
 function cancelEvents()
-  event.cancel(eventEngaged)
+  event.cancel(SG)
   event.cancel(openEvent)
   event.cancel(failEvent)
   event.cancel(key_down)
   loop = false
 end
 
-eventEngaged = event.listen("stargate_spin_chevron_engaged", function(evname, address, caller, num, lock, glyph)
+SG = event.listen("stargate_spin_chevron_engaged", function(evname, address, caller, num, lock, glyph)
   if lock then
     lock = true
     gpu.setForeground(0x03ff35)
@@ -218,6 +195,7 @@ eventEngaged = event.listen("stargate_spin_chevron_engaged", function(evname, ad
     gpu.setForeground(0x03ff35)
     print("Chevron " .. num .. " Locked -", glyph)
     print("")
+    print()
     os.sleep(0.5)
   dialNext(num)
   end
@@ -244,11 +222,15 @@ if settings.usedhd == true then
 elseif settings.usedhd == false then
   dialNext(0)
 end
-  openEvent = event.listen("stargate_open", function()
+openEvent = event.listen("stargate_open", function()
     print("StarGate Open!")
-    if not settings.justone == true then
-      openchoice()
-    end
+  i = 0
+  os.sleep(0.5)
+  iris2 = tonumber(ic[i + choice])
+  sg.sendIrisCode(iris2)
+  if settings.sgt == true then
+    os.execute("STD.lua")
+  end
     if settings.justone == true then
       while true do
         sending = event.listen("stargate_traveler", function(inbound,_,_)
@@ -263,7 +245,6 @@ end
         end)
         os.sleep(0.1)
       end
-      cancelEvents()
     end
     os.sleep(3)
     cancelEvents()
@@ -272,7 +253,7 @@ end
     gpu.setForeground(0xff0303)
     print("Unable to establish a connection:")
   end)
-  eventEngaged = event.listen("stargate_spin_chevron_engaged", function(_, _, caller, num, lock, glyph) end)
+  SG = event.listen("stargate_spin_chevron_engaged", function(_, _, caller, num, lock, glyph) end)
   failEvent = event.listen("stargate_failed", function(_, _, caller, reason)
     gpu.setForeground(0xff0303)
     if reason == "not_enough_power" then print("Not enough power to open!") end
@@ -282,3 +263,4 @@ end
     gpu.setForeground(0xffffff)
   end)
   while loop do os.sleep(0.1) end
+
