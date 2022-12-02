@@ -195,7 +195,6 @@ SG = event.listen("stargate_spin_chevron_engaged", function(evname, address, cal
     gpu.setForeground(0x03ff35)
     print("Chevron " .. num .. " Locked -", glyph)
     print("")
-    print()
     os.sleep(0.5)
   dialNext(num)
   end
@@ -228,6 +227,11 @@ openEvent = event.listen("stargate_open", function()
   os.sleep(0.5)
   iris2 = tonumber(ic[i + choice])
   sg.sendIrisCode(iris2)
+  code_respond = event.listen("code_respond", function(_, _, caller, msg)
+    msg = string.sub(msg, 1, -3)
+    print("")
+    print(msg)
+  end)
   if settings.sgt == true then
     os.execute("STD.lua")
   end
