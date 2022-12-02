@@ -82,7 +82,10 @@ end
 if HasInternet then internet = require("internet") end
 
 downloadFile("dial.lua",true)
+downloadFile("STD.lua",true)
+downloadFile("Iris-Codes.txt",true)
 downloadFile("off.lua",true)
+
 if not fs.exists("addresses.csv") then
     downloadFile("addresses.csv",true)
 else
